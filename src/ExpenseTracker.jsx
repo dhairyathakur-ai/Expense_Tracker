@@ -2,9 +2,9 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { Plus, X, Trash2, Search, Download, Pencil, ArrowUpDown, Target } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
-const INK = "#1A1A2E";
+const INK = "#1B2A4A";
 const INK_SOFT = "#3C4A66";
-const PAPER = "#FDF6E3";
+const PAPER = "#F6F1E7";
 const PAPER_LINE = "#DCD3BE";
 const BRASS = "#B98A4A";
 const RED = "#B4472F";
@@ -73,14 +73,14 @@ export default function ExpenseTracker() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await window.storage.get(STORAGE_KEY, false);
-        if (res && res.value) setTransactions(JSON.parse(res.value));
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) setTransactions(JSON.parse(raw));
       } catch (e) {
-        // key not found yet, or storage unavailable — start empty
+        // no data yet, or storage unavailable — start empty
       }
       try {
-        const res2 = await window.storage.get(BUDGETS_KEY, false);
-        if (res2 && res2.value) setBudgets(JSON.parse(res2.value));
+        const raw2 = localStorage.getItem(BUDGETS_KEY);
+        if (raw2) setBudgets(JSON.parse(raw2));
       } catch (e) {
         // no budgets set yet
       } finally {
@@ -92,8 +92,7 @@ export default function ExpenseTracker() {
   const persist = async (next) => {
     setTransactions(next);
     try {
-      const ok = await window.storage.set(STORAGE_KEY, JSON.stringify(next), false);
-      if (!ok) setLoadError(true);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch (e) {
       setLoadError(true);
     }
@@ -102,7 +101,7 @@ export default function ExpenseTracker() {
   const persistBudgets = async (next) => {
     setBudgets(next);
     try {
-      await window.storage.set(BUDGETS_KEY, JSON.stringify(next), false);
+      localStorage.setItem(BUDGETS_KEY, JSON.stringify(next));
     } catch (e) {
       setLoadError(true);
     }
